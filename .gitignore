@@ -1,13 +1,13 @@
-   # Scan output may contain personal file names - never commit it
-   pc-scan/
-   report.json
-   report.txt
-   report.html
-   approved.txt
-   cleanup-log.txt
-   !docs/sample-report.json
-   !docs/sample-report.html
-   __pycache__/
-   *.pyc
-   .DS_Store
-   Thumbs.db
+# Scan output may contain personal file names - never commit it
+pc-scan/
+report.json
+report.txt
+report.html
+approved.txt
+cleanup-log.txt
+!docs/sample-report.json
+!docs/sample-report.html
+__pycache__/
+*.pyc
+.DS_Store
+Thumbs.db
