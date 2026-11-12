@@ -1,0 +1,352 @@
+{
+ "generatedAt": "2026-11-12T14:16:55",
+ "computer": "DEMO-PC",
+ "user": "user",
+ "os": "Microsoft Windows 11 Home",
+ "isAdmin": false,
+ "drives": [
+  {
+   "drive": "C:",
+   "label": "Windows",
+   "totalGB": 475.8,
+   "freeGB": 61.5,
+   "freePct": 12.9
+  },
+  {
+   "drive": "D:",
+   "label": "Data",
+   "totalGB": 476.7,
+   "freeGB": 278.7,
+   "freePct": 58.5
+  }
+ ],
+ "cleanable": [
+  {
+   "name": "NVIDIA DX shader cache",
+   "path": "C:\\Users\\user\\AppData\\Local\\NVIDIA\\DXCache",
+   "sizeMB": 8225.9,
+   "files": 100,
+   "risk": "safe",
+   "note": ""
+  },
+  {
+   "name": "Windows temp files",
+   "path": "C:\\WINDOWS\\Temp",
+   "sizeMB": 2041.4,
+   "files": 100,
+   "risk": "safe",
+   "note": ""
+  },
+  {
+   "name": "Steam web cache",
+   "path": "C:\\Users\\user\\AppData\\Local\\Steam\\htmlcache",
+   "sizeMB": 712.4,
+   "files": 100,
+   "risk": "safe",
+   "note": ""
+  },
+  {
+   "name": "Crash dumps",
+   "path": "C:\\Users\\user\\AppData\\Local\\CrashDumps",
+   "sizeMB": 632.6,
+   "files": 100,
+   "risk": "safe",
+   "note": ""
+  },
+  {
+   "name": "Chrome cache",
+   "path": "C:\\Users\\user\\AppData\\Local\\Google\\Chrome\\User Data\\Default\\Cache",
+   "sizeMB": 372.1,
+   "files": 100,
+   "risk": "safe",
+   "note": ""
+  },
+  {
+   "name": "Discord cache",
+   "path": "C:\\Users\\user\\AppData\\Roaming\\discord\\Cache",
+   "sizeMB": 262.4,
+   "files": 100,
+   "risk": "safe",
+   "note": ""
+  },
+  {
+   "name": "User temp files (%TEMP%)",
+   "path": "C:\\Users\\user\\AppData\\Local\\Temp",
+   "sizeMB": 170.6,
+   "files": 100,
+   "risk": "safe",
+   "note": ""
+  },
+  {
+   "name": "Downloads folder",
+   "path": "C:\\Users\\user\\Downloads",
+   "sizeMB": 10174,
+   "files": 100,
+   "risk": "check",
+   "note": ""
+  },
+  {
+   "name": "Lunar Client",
+   "path": "C:\\Users\\user\\.lunarclient",
+   "sizeMB": 4274.8,
+   "files": 100,
+   "risk": "check",
+   "note": ""
+  },
+  {
+   "name": "Recycle Bin (C:)",
+   "path": "C:\\$Recycle.Bin",
+   "sizeMB": 729.9,
+   "files": 100,
+   "risk": "check",
+   "note": ""
+  },
+  {
+   "name": "Windows Update download cache",
+   "path": "C:\\WINDOWS\\SoftwareDistribution\\Download",
+   "sizeMB": 257.8,
+   "files": 100,
+   "risk": "check",
+   "note": ""
+  }
+ ],
+ "largeFiles": [
+  {
+   "path": "C:\\Users\\user\\AppData\\Local\\VideoEditor\\Apps\\9.8.0\\gpu_runtime.dll",
+   "sizeMB": 690.0,
+   "lastWrite": "2026-05-01",
+   "lastAccess": "2026-05-01",
+   "ext": ".dll"
+  },
+  {
+   "path": "C:\\Users\\user\\AppData\\Local\\VideoEditor\\Apps\\10.2.0\\gpu_runtime.dll",
+   "sizeMB": 690.0,
+   "lastWrite": "2026-05-01",
+   "lastAccess": "2026-05-01",
+   "ext": ".dll"
+  },
+  {
+   "path": "C:\\Users\\user\\AppData\\Local\\VideoEditor\\Apps\\10.5.1\\gpu_runtime.dll",
+   "sizeMB": 690.0,
+   "lastWrite": "2026-05-01",
+   "lastAccess": "2026-05-01",
+   "ext": ".dll"
+  },
+  {
+   "path": "C:\\Users\\user\\AppData\\Local\\VideoEditor\\Apps\\11.0.0\\gpu_runtime.dll",
+   "sizeMB": 690.0,
+   "lastWrite": "2026-05-01",
+   "lastAccess": "2026-05-01",
+   "ext": ".dll"
+  },
+  {
+   "path": "C:\\Users\\user\\AppData\\Local\\VideoEditor\\Apps\\11.3.2\\gpu_runtime.dll",
+   "sizeMB": 690.0,
+   "lastWrite": "2026-05-01",
+   "lastAccess": "2026-05-01",
+   "ext": ".dll"
+  },
+  {
+   "path": "C:\\Users\\user\\Videos\\Captures\\gameplay 2026-08-24.mp4",
+   "sizeMB": 5186.8,
+   "lastWrite": "2026-08-24",
+   "lastAccess": "2026-08-24",
+   "ext": ".mp4"
+  },
+  {
+   "path": "C:\\Users\\user\\Desktop\\drone_footage_0351.MP4",
+   "sizeMB": 4012.6,
+   "lastWrite": "2026-07-15",
+   "lastAccess": "2026-09-01",
+   "ext": ".mp4"
+  },
+  {
+   "path": "C:\\Users\\user\\Downloads\\game-assets-part1.zip",
+   "sizeMB": 2025.1,
+   "lastWrite": "2026-09-27",
+   "lastAccess": "2026-09-27",
+   "ext": ".zip"
+  },
+  {
+   "path": "C:\\Users\\user\\Documents\\Adobe\\Premiere Pro\\Video Previews\\project.PRV\\Rendered - 8f1d.avi",
+   "sizeMB": 3200.0,
+   "lastWrite": "2026-03-01",
+   "lastAccess": "2026-03-01",
+   "ext": ".avi"
+  },
+  {
+   "path": "C:\\Users\\user\\AppData\\Local\\GameOverlay\\CrashDumps\\overlay.exe.13236.dmp",
+   "sizeMB": 1275.5,
+   "lastWrite": "2026-08-19",
+   "lastAccess": "2026-08-19",
+   "ext": ".dmp"
+  },
+  {
+   "path": "C:\\Users\\user\\AppData\\Local\\VideoEditor\\User Data\\Download\\update_1793884034209.exe",
+   "sizeMB": 963.5,
+   "lastWrite": "2026-11-05",
+   "lastAccess": "2026-11-05",
+   "ext": ".exe"
+  },
+  {
+   "path": "C:\\Users\\user\\Desktop\\fonts-collection.zip",
+   "sizeMB": 745.0,
+   "lastWrite": "2024-07-26",
+   "lastAccess": "2025-01-12",
+   "ext": ".zip"
+  }
+ ],
+ "largeFolders": [
+  {
+   "path": "C:\\Users\\user\\AppData",
+   "sizeMB": 98000,
+   "files": 1
+  },
+  {
+   "path": "C:\\Users\\user\\Desktop",
+   "sizeMB": 28000,
+   "files": 1
+  },
+  {
+   "path": "C:\\Users\\user\\Videos",
+   "sizeMB": 11638,
+   "files": 1
+  },
+  {
+   "path": "C:\\Users\\user\\Downloads",
+   "sizeMB": 10174,
+   "files": 1
+  },
+  {
+   "path": "C:\\Users\\user\\Documents",
+   "sizeMB": 6400,
+   "files": 1
+  },
+  {
+   "path": "C:\\Users\\user\\.lunarclient",
+   "sizeMB": 4274,
+   "files": 1
+  },
+  {
+   "path": "C:\\Users\\user\\Pictures",
+   "sizeMB": 900,
+   "files": 1
+  }
+ ],
+ "programs": [
+  {
+   "name": "Java(TM) SE Development Kit 22.0.2 (64-bit)",
+   "publisher": "Oracle Corporation",
+   "version": "",
+   "installDate": "2024-07-25",
+   "sizeMB": 313.6,
+   "location": ""
+  },
+  {
+   "name": "Java(TM) SE Development Kit 19.0.2 (64-bit)",
+   "publisher": "Oracle Corporation",
+   "version": "",
+   "installDate": "2024-07-25",
+   "sizeMB": 305,
+   "location": ""
+  },
+  {
+   "name": "McAfee LiveSafe",
+   "publisher": "McAfee, LLC",
+   "version": "",
+   "installDate": null,
+   "sizeMB": 1045.8,
+   "location": ""
+  },
+  {
+   "name": "Some Big Game Launcher",
+   "publisher": "Example Inc.",
+   "version": "",
+   "installDate": "2025-06-19",
+   "sizeMB": 5150.5,
+   "location": ""
+  },
+  {
+   "name": "Microsoft Visual C++ 2015-2022 Redistributable (x64)",
+   "publisher": "Microsoft Corporation",
+   "version": "",
+   "installDate": null,
+   "sizeMB": 20.8,
+   "location": ""
+  },
+  {
+   "name": "7-Zip 24.07 (x64)",
+   "publisher": "Igor Pavlov",
+   "version": "",
+   "installDate": null,
+   "sizeMB": 5.6,
+   "location": ""
+  }
+ ],
+ "startup": [
+  {
+   "source": "HKCU:\\...\\Run",
+   "name": "Discord",
+   "command": "C:\\Users\\user\\AppData\\Local\\Discord\\Update.exe --processStart Discord.exe",
+   "exe": "",
+   "exists": true,
+   "signature": "Valid",
+   "signer": "Discord Inc.",
+   "flags": []
+  },
+  {
+   "source": "HKCU:\\...\\Run",
+   "name": "OldVPN",
+   "command": "C:\\Program Files\\OldVPN\\vpn.exe",
+   "exe": "",
+   "exists": false,
+   "signature": "Unknown",
+   "signer": null,
+   "flags": [
+    "file-missing"
+   ]
+  },
+  {
+   "source": "HKLM:\\...\\Run",
+   "name": "SecurityHealth",
+   "command": "%windir%\\system32\\SecurityHealthSystray.exe",
+   "exe": "",
+   "exists": true,
+   "signature": "Valid",
+   "signer": "Microsoft Windows",
+   "flags": []
+  }
+ ],
+ "security": {
+  "defender": {
+   "antivirusEnabled": true,
+   "realTimeProtection": true,
+   "signatureAgeDays": 0,
+   "lastQuickScan": "2026-11-12T00:32:29",
+   "lastFullScan": null
+  },
+  "recentThreats": [],
+  "flaggedStartup": [
+   {
+    "source": "HKCU:\\...\\Run",
+    "name": "OldVPN",
+    "command": "C:\\Program Files\\OldVPN\\vpn.exe",
+    "exe": "",
+    "exists": false,
+    "signature": "Unknown",
+    "signer": null,
+    "flags": [
+     "file-missing"
+    ]
+   }
+  ],
+  "recentExecutablesInTempOrDownloads": [],
+  "fractureiserIndicators": {
+   "files": [],
+   "startupEntries": []
+  },
+  "minecraftModJars": [],
+  "minecraftModJarCount": 156
+ },
+ "elapsedSeconds": 84
+}

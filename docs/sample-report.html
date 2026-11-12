@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PC Cleanup Report</title>
+<style>
+:root{
+  --bg:#f6f7f9; --card:#fff; --ink:#1d2329; --muted:#66707a; --line:#e3e6ea;
+  --green:#1f9d55; --green-bg:#e8f6ee; --yellow:#b7791f; --yellow-bg:#fdf5e6;
+  --red:#c53030; --red-bg:#fdecec; --gray:#8a939c; --gray-bg:#f0f2f4; --accent:#2b6cb0;
+}
+@media (prefers-color-scheme: dark){
+  :root{ --bg:#15181c; --card:#1e2227; --ink:#e6e9ec; --muted:#9aa3ad; --line:#2e343b;
+    --green-bg:#173325; --yellow-bg:#3a2e15; --red-bg:#3b1c1c; --gray-bg:#262b31; --accent:#63a4e8; }
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:"Segoe UI","Microsoft JhengHei",system-ui,sans-serif;background:var(--bg);color:var(--ink);font-size:14px;line-height:1.5}
+.wrap{max-width:1040px;margin:0 auto;padding:24px 20px 120px}
+h1{font-size:24px;margin:0 0 4px}
+h2{font-size:17px;margin:0;display:flex;align-items:center;gap:8px}
+.sub{color:var(--muted);font-size:13px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px 20px;margin-top:16px}
+.grid{display:grid;gap:12px}
+.g3{grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
+.stat .num{font-size:26px;font-weight:700}
+.stat .lbl{color:var(--muted);font-size:13px}
+.bar{height:10px;background:var(--gray-bg);border-radius:6px;overflow:hidden;margin:8px 0 4px}
+.bar>div{height:100%;border-radius:6px}
+.pill{display:inline-block;padding:2px 9px;border-radius:999px;font-size:12px;font-weight:600}
+.p-green{background:var(--green-bg);color:var(--green)} .p-yellow{background:var(--yellow-bg);color:var(--yellow)}
+.p-red{background:var(--red-bg);color:var(--red)} .p-gray{background:var(--gray-bg);color:var(--gray)}
+.sec-head{display:flex;justify-content:space-between;align-items:center;cursor:pointer;user-select:none}
+.sec-head .tot{color:var(--muted);font-weight:600}
+.items{margin-top:12px}
+.item{display:grid;grid-template-columns:28px 34px 1fr auto;gap:8px;align-items:start;padding:10px 4px;border-top:1px solid var(--line)}
+.item:first-child{border-top:none}
+.item .no{color:var(--muted);font-variant-numeric:tabular-nums;padding-top:1px}
+.item .name{font-weight:600}
+.item .note{color:var(--muted);font-size:13px}
+.item .path{font-family:Consolas,monospace;font-size:12px;color:var(--muted);word-break:break-all}
+.item .size{font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap}
+.item.info{grid-template-columns:28px 1fr auto}
+input[type=checkbox]{width:18px;height:18px;margin-top:2px;accent-color:var(--accent);cursor:pointer}
+select{font:inherit;font-size:12px;padding:1px 4px;border-radius:6px;border:1px solid var(--line);background:var(--card);color:var(--ink);margin-top:4px}
+.collapsed .items,.collapsed .sec-tools{display:none}
+.sec-tools{margin-top:8px;display:flex;gap:8px}
+button{font:inherit;cursor:pointer;border-radius:8px;border:1px solid var(--line);background:var(--card);color:var(--ink);padding:6px 12px}
+button.primary{background:var(--accent);color:#fff;border-color:var(--accent);font-weight:600}
+button.link{border:none;background:none;color:var(--accent);padding:0}
+.fbars .row{display:grid;grid-template-columns:minmax(120px,240px) 1fr 80px;gap:10px;align-items:center;margin:6px 0;font-size:13px}
+.fbars .row .lab{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fbars .row .b{height:14px;background:var(--accent);border-radius:4px;opacity:.75}
+.fbars .row .v{text-align:right;font-variant-numeric:tabular-nums}
+table{width:100%;border-collapse:collapse;font-size:13px;margin-top:10px}
+th,td{text-align:left;padding:7px 6px;border-top:1px solid var(--line);vertical-align:top}
+th{color:var(--muted);font-weight:600;border-top:none}
+td.r,th.r{text-align:right}
+.sec-list .s{display:flex;gap:10px;padding:10px 0;border-top:1px solid var(--line)}
+.sec-list .s:first-child{border-top:none}
+.ico{width:22px;flex:none;text-align:center;font-size:16px}
+.dock{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:1px solid var(--line);box-shadow:0 -4px 16px rgba(0,0,0,.06)}
+.dock .in{max-width:1040px;margin:0 auto;padding:12px 20px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.dock .sel{font-weight:700;font-size:15px}
+.dock .hint{color:var(--muted);font-size:12px;flex:1;min-width:200px}
+.toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:#222;color:#fff;padding:8px 16px;border-radius:8px;font-size:13px;opacity:0;transition:opacity .2s;pointer-events:none}
+.toast.on{opacity:.92}
+.empty{color:var(--muted);padding:8px 4px}
+.top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.langsw button{padding:3px 10px;font-size:12px}
+.langsw button.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+</style>
+
+</head>
+<body>
+<div class="wrap">
+  <div class="top"><div><h1 id="title"></h1><div class="sub" id="meta"></div></div>
+    <div class="langsw"><button data-lang="zh">中文</button> <button data-lang="en">English</button></div></div>
+  <div class="card"><div class="grid g3" id="drives"></div></div>
+  <div class="grid g3" id="summary" style="margin-top:16px"></div>
+  <div class="card" id="sec-green"></div>
+  <div class="card" id="sec-yellow"></div>
+  <div class="card collapsed" id="sec-info"></div>
+  <div class="card"><h2 id="fTitle"></h2><div class="sub" id="fSub"></div><div class="fbars" id="folders" style="margin-top:10px"></div></div>
+  <div class="card" id="programs"></div>
+  <div class="card" id="startup"></div>
+  <div class="card" id="security"></div>
+</div>
+<div class="dock"><div class="in">
+  <div class="sel" id="selInfo"></div>
+  <div class="hint" id="dockHint"></div>
+  <button id="btnDl"></button>
+  <button class="primary" id="btnCopy"></button>
+</div></div>
+<div class="toast" id="toast"></div>
+<script>
+const REPORT = {
+ "generatedAt": "2026-11-12T14:16:55",
+ "computer": "DEMO-PC",
+ "user": "user",
+ "os": "Microsoft Windows 11 Home",
+ "isAdmin": false,
+ "drives": [
+  {
+   "drive": "C:",
+   "label": "Windows",
+   "totalGB": 475.8,
+   "freeGB": 61.5,
+   "freePct": 12.9
+  },
+  {
+   "drive": "D:",
+   "label": "Data",
+   "totalGB": 476.7,
+   "freeGB": 278.7,
+   "freePct": 58.5
+  }
+ ],
+ "cleanable": [
+  {
+   "name": "NVIDIA DX shader cache",
+   "path": "C:\\Users\\user\\AppData\\Local\\NVIDIA\\DXCache",
+   "sizeMB": 8225.9,
+   "files": 100,
+   "risk": "safe",
+   "note": ""
+  },
+  {
+   "name": "Windows temp files",
+   "path": "C:\\WINDOWS\\Temp",
+   "sizeMB": 2041.4,
+   "files": 100,
+   "risk": "safe",
+   "note": ""
+  },
+  {
+   "name": "Steam web cache",
+   "path": "C:\\Users\\user\\AppData\\Local\\Steam\\htmlcache",
+   "sizeMB": 712.4,
+   "files": 100,
+   "risk": "safe",
+   "note": ""
+  },
+  {
+   "name": "Crash dumps",
+   "path": "C:\\Users\\user\\AppData\\Local\\CrashDumps",
+   "sizeMB": 632.6,
+   "files": 100,
+   "risk": "safe",
+   "note": ""
+  },
+  {
+   "name": "Chrome cache",
+   "path": "C:\\Users\\user\\AppData\\Local\\Google\\Chrome\\User Data\\Default\\Cache",
+   "sizeMB": 372.1,
+   "files": 100,
+   "risk": "safe",
+   "note": ""
+  },
+  {
+   "name": "Discord cache",
+   "path": "C:\\Users\\user\\AppData\\Roaming\\discord\\Cache",
+   "sizeMB": 262.4,
+   "files": 100,
+   "risk": "safe",
+   "note": ""
+  },
+  {
+   "name": "User temp files (%TEMP%)",
+   "path": "C:\\Users\\user\\AppData\\Local\\Temp",
+   "sizeMB": 170.6,
+   "files": 100,
+   "risk": "safe",
+   "note": ""
+  },
+  {
+   "name": "Downloads folder",
+   "path": "C:\\Users\\user\\Downloads",
+   "sizeMB": 10174,
+   "files": 100,
+   "risk": "check",
+   "note": ""
+  },
+  {
+   "name": "Lunar Client",
+   "path": "C:\\Users\\user\\.lunarclient",
+   "sizeMB": 4274.8,
+   "files": 100,
+   "risk": "check",
+   "note": ""
+  },
+  {
+   "name": "Recycle Bin (C:)",
+   "path": "C:\\$Recycle.Bin",
+   "sizeMB": 729.9,
+   "files": 100,
+   "risk": "check",
+   "note": ""
+  },
+  {
+   "name": "Windows Update download cache",
+   "path": "C:\\WINDOWS\\SoftwareDistribution\\Download",
+   "sizeMB": 257.8,
+   "files": 100,
+   "risk": "check",
+   "note": ""
+  }
+ ],
+ "largeFiles": [
+  {
+   "path": "C:\\Users\\user\\AppData\\Local\\VideoEditor\\Apps\\9.8.0\\gpu_runtime.dll",
+   "sizeMB": 690.0,
+   "lastWrite": "2026-05-01",
+   "lastAccess": "2026-05-01",
+   "ext": ".dll"
+  },
+  {
+   "path": "C:\\Users\\user\\AppData\\Local\\VideoEditor\\Apps\\10.2.0\\gpu_runtime.dll",
+   "sizeMB": 690.0,
+   "lastWrite": "2026-05-01",
+   "lastAccess": "2026-05-01",
+   "ext": ".dll"
+  },
+  {
+   "path": "C:\\Users\\user\\AppData\\Local\\VideoEditor\\Apps\\10.5.1\\gpu_runtime.dll",
+   "sizeMB": 690.0,
+   "lastWrite": "2026-05-01",
+   "lastAccess": "2026-05-01",
+   "ext": ".dll"
+  },
+  {
+   "path": "C:\\Users\\user\\AppData\\Local\\VideoEditor\\Apps\\11.0.0\\gpu_runtime.dll",
+   "sizeMB": 690.0,
+   "lastWrite": "2026-05-01",
+   "lastAccess": "2026-05-01",
+   "ext": ".dll"
+  },
+  {
+   "path": "C:\\Users\\user\\AppData\\Local\\VideoEditor\\Apps\\11.3.2\\gpu_runtime.dll",
+   "sizeMB": 690.0,
+   "lastWrite": "2026-05-01",
+   "lastAccess": "2026-05-01",
+   "ext": ".dll"
+  },
+  {
+   "path": "C:\\Users\\user\\Videos\\Captures\\gameplay 2026-08-24.mp4",
+   "sizeMB": 5186.8,
+   "lastWrite": "2026-08-24",
+   "lastAccess": "2026-08-24",
+   "ext": ".mp4"
+  },
+  {
+   "path": "C:\\Users\\user\\Desktop\\drone_footage_0351.MP4",
+   "sizeMB": 4012.6,
+   "lastWrite": "2026-07-15",
+   "lastAccess": "2026-09-01",
+   "ext": ".mp4"
+  },
+  {
+   "path": "C:\\Users\\user\\Downloads\\game-assets-part1.zip",
+   "sizeMB": 2025.1,
+   "lastWrite": "2026-09-27",
+   "lastAccess": "2026-09-27",
+   "ext": ".zip"
+  },
+  {
+   "path": "C:\\Users\\user\\Documents\\Adobe\\Premiere Pro\\Video Previews\\project.PRV\\Rendered - 8f1d.avi",
+   "sizeMB": 3200.0,
+   "lastWrite": "2026-03-01",
+   "lastAccess": "2026-03-01",
+   "ext": ".avi"
+  },
+  {
+   "path": "C:\\Users\\user\\AppData\\Local\\GameOverlay\\CrashDumps\\overlay.exe.13236.dmp",
+   "sizeMB": 1275.5,
+   "lastWrite": "2026-08-19",
+   "lastAccess": "2026-08-19",
+   "ext": ".dmp"
+  },
+  {
+   "path": "C:\\Users\\user\\AppData\\Local\\VideoEditor\\User Data\\Download\\update_1793884034209.exe",
+   "sizeMB": 963.5,
+   "lastWrite": "2026-11-05",
+   "lastAccess": "2026-11-05",
+   "ext": ".exe"
+  },
+  {
+   "path": "C:\\Users\\user\\Desktop\\fonts-collection.zip",
+   "sizeMB": 745.0,
+   "lastWrite": "2024-07-26",
+   "lastAccess": "2025-01-12",
+   "ext": ".zip"
+  }
+ ],
+ "largeFolders": [
+  {
+   "path": "C:\\Users\\user\\AppData",
+   "sizeMB": 98000,
+   "files": 1
+  },
+  {
+   "path": "C:\\Users\\user\\Desktop",
+   "sizeMB": 28000,
+   "files": 1
+  },
+  {
+   "path": "C:\\Users\\user\\Videos",
+   "sizeMB": 11638,
+   "files": 1
+  },
+  {
+   "path": "C:\\Users\\user\\Downloads",
+   "sizeMB": 10174,
+   "files": 1
+  },
+  {
+   "path": "C:\\Users\\user\\Documents",
+   "sizeMB": 6400,
+   "files": 1
+  },
+  {
+   "path": "C:\\Users\\user\\.lunarclient",
+   "sizeMB": 4274,
+   "files": 1
+  },
+  {
+   "path": "C:\\Users\\user\\Pictures",
+   "sizeMB": 900,
+   "files": 1
+  }
+ ],
+ "programs": [
+  {
+   "name": "Java(TM) SE Development Kit 22.0.2 (64-bit)",
+   "publisher": "Oracle Corporation",
+   "version": "",
+   "installDate": "2024-07-25",
+   "sizeMB": 313.6,
+   "location": ""
+  },
+  {
+   "name": "Java(TM) SE Development Kit 19.0.2 (64-bit)",
+   "publisher": "Oracle Corporation",
+   "version": "",
+   "installDate": "2024-07-25",
+   "sizeMB": 305,
+   "location": ""
+  },
+  {
+   "name": "McAfee LiveSafe",
+   "publisher": "McAfee, LLC",
+   "version": "",
+   "installDate": null,
+   "sizeMB": 1045.8,
+   "location": ""
+  },
+  {
+   "name": "Some Big Game Launcher",
+   "publisher": "Example Inc.",
+   "version": "",
+   "installDate": "2025-06-19",
+   "sizeMB": 5150.5,
+   "location": ""
+  },
+  {
+   "name": "Microsoft Visual C++ 2015-2022 Redistributable (x64)",
+   "publisher": "Microsoft Corporation",
+   "version": "",
+   "installDate": null,
+   "sizeMB": 20.8,
+   "location": ""
+  },
+  {
+   "name": "7-Zip 24.07 (x64)",
+   "publisher": "Igor Pavlov",
+   "version": "",
+   "installDate": null,
+   "sizeMB": 5.6,
+   "location": ""
+  }
+ ],
+ "startup": [
+  {
+   "source": "HKCU:\\...\\Run",
+   "name": "Discord",
+   "command": "C:\\Users\\user\\AppData\\Local\\Discord\\Update.exe --processStart Discord.exe",
+   "exe": "",
+   "exists": true,
+   "signature": "Valid",
+   "signer": "Discord Inc.",
+   "flags": []
+  },
+  {
+   "source": "HKCU:\\...\\Run",
+   "name": "OldVPN",
+   "command": "C:\\Program Files\\OldVPN\\vpn.exe",
+   "exe": "",
+   "exists": false,
+   "signature": "Unknown",
+   "signer": null,
+   "flags": [
+    "file-missing"
+   ]
+  },
+  {
+   "source": "HKLM:\\...\\Run",
+   "name": "SecurityHealth",
+   "command": "%windir%\\system32\\SecurityHealthSystray.exe",
+   "exe": "",
+   "exists": true,
+   "signature": "Valid",
+   "signer": "Microsoft Windows",
+   "flags": []
+  }
+ ],
+ "security": {
+  "defender": {
+   "antivirusEnabled": true,
+   "realTimeProtection": true,
+   "signatureAgeDays": 0,
+   "lastQuickScan": "2026-11-12T00:32:29",
+   "lastFullScan": null
+  },
+  "recentThreats": [],
+  "flaggedStartup": [
+   {
+    "source": "HKCU:\\...\\Run",
+    "name": "OldVPN",
+    "command": "C:\\Program Files\\OldVPN\\vpn.exe",
+    "exe": "",
+    "exists": false,
+    "signature": "Unknown",
+    "signer": null,
+    "flags": [
+     "file-missing"
+    ]
+   }
+  ],
+  "recentExecutablesInTempOrDownloads": [],
+  "fractureiserIndicators": {
+   "files": [],
+   "startupEntries": []
+  },
+  "minecraftModJars": [],
+  "minecraftModJarCount": 156
+ },
+ "elapsedSeconds": 84
+};
+
+/* ================= i18n ================= */
+const I18N = {
+ zh: {
+  title:'電腦整理報告', scanned:'掃描時間', sec:'秒', nonAdmin:'非系統管理員模式',
+  free:'剩', of:'共', low:'空間不足', little:'偏少', ok:'充足',
+  safeSum:'可以安全清理', checkSum:'需要你確認', secSum:'安全性檢查', alerts:n=>`${n} 項提醒`, noAlerts:'沒有異狀',
+  green:'可以安全清理', yellow:'需要你確認', info:'建議不要動／請用其他方式處理', items:n=>`${n} 項`, expand:'展開', none:'沒有項目', selectAll:'全選這一區',
+  actDel:'刪除（移到資源回收筒）', actMove:(d,g)=>`搬到 ${d}（剩 ${g} GB）`,
+  fTitle:'📊 空間都去哪了', fSub:'使用者資料夾裡最大的資料夾', fNone:'（快速模式沒有掃描資料夾大小）',
+  progTitle:'🧩 可以考慮移除的程式', progCount:n=>`共 ${n} 個程式`, progHow:'程式要用「設定 → 應用程式 → 已安裝的應用程式」正常解除安裝，不要直接刪資料夾。',
+  thProg:'程式', thSize:'大小', thAdvice:'建議', installed:'安裝於', progNone:'沒有特別建議', progAll:n=>`顯示全部 ${n} 個程式`, keepSys:'系統元件，請保留',
+  dupFam:(n,f)=>`同時裝了 ${n} 個 ${f}，可能只需要一個`, avDup:'Windows Defender 已開啟；兩套防毒同時跑會拖慢電腦，若是試用版可考慮移除', big:'佔用空間大，不常用可移除',
+  stTitle:'🚀 開機自動啟動', stHow:'停用方式：工作管理員（Ctrl+Shift+Esc）→ 啟動應用程式 → 右鍵「停用」。停用可以隨時改回來，不會刪除程式。',
+  stOld:'這份資料是舊版掃描產生的，只列出被標記的項目；重新掃描一次就會有完整清單。', thItem:'項目', thPub:'發行者', signed:'已簽章', unknown:'未知',
+  stLeft:'殘留，可停用', stLook:'建議查看', stKeep:'建議保留', stTask:'排程工作', stOpt:'不常用可停用', stNone:'沒有找到開機啟動項目',
+  secTitle:'🛡️ 安全性檢查', secSub:'以下只是提示，真正的判斷請交給防毒軟體。',
+  defOff:'Windows Defender 即時保護沒有開', defOffD:'到「Windows 安全性 → 病毒與威脅防護」開啟。若另外裝了其他防毒軟體，這是正常的。',
+  defOn:'Windows Defender 運作中', defOnD:a=>'即時保護已開啟，病毒碼'+(a===0?'是今天的版本':` ${a} 天前更新`)+'。',
+  sigOld:'病毒碼超過一週沒更新', sigOldD:'到 Windows Update 檢查更新。',
+  noFull:'從來沒有跑過完整掃描', noFullD:'Windows 安全性 → 病毒與威脅防護 → 掃描選項 → 完整掃描。',
+  threats:n=>`最近偵測到 ${n} 個威脅`, threatsD:'到「Windows 安全性 → 保護歷程記錄」查看並處理。', noThreats:'最近沒有偵測到威脅',
+  stItem:n=>`開機項目：${n}`, stMissingD:'指向的程式已經不存在，是解除安裝後的殘留，沒有危害。可在「工作管理員 → 啟動應用程式」停用。',
+  stFlagD:(f,e)=>`標記原因：${f}。建議用 Defender 掃描這個檔案：${e}`,
+  frac:'發現 Minecraft 惡意模組（fractureiser）跡象', fracD:'請立刻執行 Microsoft Defender 離線掃描，並更改重要帳號密碼。',
+  mods:n=>`檢查了 ${n} 個 Minecraft 模組`, modsD:'沒有發現已知惡意模組（fractureiser）的跡象。模組請只從 CurseForge／Modrinth 下載。',
+  exe:n=>`下載／暫存資料夾裡有 ${n} 個近期的執行檔`, exeD:'是自己下載的就沒問題；不認得的請先用 Defender 掃描。',
+  selNone:'尚未勾選', sel:(n,s)=>`已勾選 ${n} 項 · ${s}`, dockHint:'只會移到資源回收筒，可以還原。清空資源回收筒後，空間才會真正釋放。',
+  btnDl:'下載清理清單', btnCopy:'複製並交給 Claude', pickFirst:'請先勾選要處理的項目', pickDel:'請先勾選要刪除的項目',
+  copied:'已複製！回到 Claude 對話框貼上即可', downloaded:'已下載 approved.txt，放到 pc-scan 資料夾後執行 run_cleanup.bat',
+  cIntro:(n,s)=>`我在電腦整理報告裡勾選了 ${n} 項（約 ${s}），請幫我處理：`, cDel:'【移到資源回收筒】編號', cList:'清理清單（approved.txt）：', cMove:d=>`【搬到 ${d}】`, cGen:'由電腦整理報告產生',
+  lastOpen:'最後開啟', noData:'找不到掃描資料', noDataD:'請重新執行 scan.ps1。',
+  recycle:d=>`資源回收筒（${d}）`, recycleN:'清空後無法復原，請自己確認後再清空',
+  oldVer:(a,n)=>`${a} 舊版本殘留（${n} 個）`, oldVerN:v=>`目前使用的版本是 ${v}（會保留）。刪除前請先關閉這個程式。大小為最低估計。`, program:'程式',
+  dmp:'當機記錄檔', upd:'程式更新後留下的安裝檔，已安裝的版本用不到', adobe:'Adobe 算圖／媒體快取，可以重建，但下次開專案要重新算',
+  appFile:'程式本身或資料，請用「解除安裝」處理，不要手動刪', selfJudge:'請自行判斷',
+  L:{
+  'User temp files (%TEMP%)':['使用者暫存檔','程式用完留下的暫存檔；正在使用的會自動跳過'],
+  'Windows temp files':['Windows 暫存檔','部分檔案需要系統管理員權限，清不掉的會跳過'],
+  'Crash dumps':['當機傾印檔','程式當機時留下的記錄，平常用不到'],
+  'Windows error reports':['Windows 錯誤報告','建議用「設定 → 儲存空間 → 暫存檔案」清'],
+  'DirectX shader cache':['DirectX 著色器快取','會自動重建，下次開遊戲第一次會稍慢'],
+  'NVIDIA DX shader cache':['NVIDIA 著色器快取（DX）','會自動重建，下次開遊戲第一次會稍慢'],
+  'NVIDIA GL shader cache':['NVIDIA 著色器快取（GL）','會自動重建'],
+  'Chrome cache':['Chrome 快取','先關閉 Chrome；不會刪到登入或瀏覽紀錄'],
+  'Chrome code cache':['Chrome 程式碼快取','先關閉 Chrome'],
+  'Edge cache':['Edge 快取','先關閉 Edge；不會刪到登入或瀏覽紀錄'],
+  'Edge code cache':['Edge 程式碼快取','先關閉 Edge'],
+  'Discord cache':['Discord 快取','先關閉 Discord'],
+  'Discord code cache':['Discord 程式碼快取','先關閉 Discord'],
+  'Steam web cache':['Steam 網頁快取','先關閉 Steam'],
+  'Minecraft logs (.minecraft)':['Minecraft 記錄檔','舊的遊戲記錄'],
+  'Minecraft crash reports':['Minecraft 當機報告','舊的當機報告'],
+  'Lunar Client':['Lunar Client 資料','只有確定不再玩 Lunar Client 才刪'],
+  'Windows Update download cache':['Windows Update 下載暫存','請用「設定 → 系統 → 儲存空間 → 暫存檔案」清理'],
+  'Downloads folder':['下載資料夾','個人檔案，下面「大型個人檔案」會逐一列出'],
+  'CurseForge Minecraft instances':['CurseForge 模組包','裡面有世界存檔，請在 CurseForge 裡刪除整個不玩的模組包'],
+  }
+ },
+ en: {
+  title:'PC Cleanup Report', scanned:'Scanned', sec:'s', nonAdmin:'not running as administrator',
+  free:'', of:'free of', low:'Low', little:'Getting full', ok:'OK',
+  safeSum:'Safe to clean', checkSum:'Needs your review', secSum:'Security check', alerts:n=>`${n} alert${n>1?'s':''}`, noAlerts:'All clear',
+  green:'Safe to clean', yellow:'Needs your review', info:"Don't touch / handle another way", items:n=>`${n} item${n===1?'':'s'}`, expand:'Expand', none:'Nothing here', selectAll:'Select all in this section',
+  actDel:'Delete (move to Recycle Bin)', actMove:(d,g)=>`Move to ${d} (${g} GB free)`,
+  fTitle:'📊 Where your space went', fSub:'Largest folders in your user profile', fNone:'(Quick mode skipped folder sizes)',
+  progTitle:'🧩 Programs you might remove', progCount:n=>`${n} programs`, progHow:"Uninstall through Settings → Apps → Installed apps. Don't delete program folders directly.",
+  thProg:'Program', thSize:'Size', thAdvice:'Suggestion', installed:'installed', progNone:'No suggestions', progAll:n=>`Show all ${n} programs`, keepSys:'System component — keep',
+  dupFam:(n,f)=>`${n} versions of ${f} installed — you may only need one`, avDup:'Windows Defender is already on; two antivirus programs slow the PC down. Consider removing it if it is a trial.', big:'Takes a lot of space — remove if you rarely use it',
+  stTitle:'🚀 Startup programs', stHow:'To disable: Task Manager (Ctrl+Shift+Esc) → Startup apps → right-click → Disable. You can turn it back on anytime; nothing is deleted.',
+  stOld:'This data came from an older scan and only lists flagged items. Scan again for the full list.', thItem:'Item', thPub:'Publisher', signed:'Signed', unknown:'Unknown',
+  stLeft:'Leftover — can disable', stLook:'Take a look', stKeep:'Keep', stTask:'Scheduled task', stOpt:'Can disable if unused', stNone:'No startup items found',
+  secTitle:'🛡️ Security check', secSub:'These are hints only — leave the real verdict to your antivirus.',
+  defOff:'Windows Defender real-time protection is off', defOffD:'Turn it on in Windows Security → Virus & threat protection. This is normal if you use another antivirus.',
+  defOn:'Windows Defender is running', defOnD:a=>'Real-time protection is on; definitions '+(a===0?'were updated today.':`are ${a} day(s) old.`),
+  sigOld:'Virus definitions are over a week old', sigOldD:'Check Windows Update.',
+  noFull:'A full scan has never been run', noFullD:'Windows Security → Virus & threat protection → Scan options → Full scan.',
+  threats:n=>`${n} threat(s) detected recently`, threatsD:'Review them in Windows Security → Protection history.', noThreats:'No recent threats detected',
+  stItem:n=>`Startup item: ${n}`, stMissingD:'The program it points to no longer exists — a harmless leftover from an uninstall. You can disable it in Task Manager → Startup apps.',
+  stFlagD:(f,e)=>`Flagged because: ${f}. Scan this file with Defender: ${e}`,
+  frac:'Signs of Minecraft malware (fractureiser) found', fracD:'Run a Microsoft Defender Offline scan now and change important passwords.',
+  mods:n=>`Checked ${n} Minecraft mods`, modsD:'No signs of known mod malware (fractureiser). Only download mods from CurseForge / Modrinth.',
+  exe:n=>`${n} recent executable(s) in Downloads/Temp`, exeD:"Fine if you downloaded them yourself; scan anything you don't recognise with Defender.",
+  selNone:'Nothing selected', sel:(n,s)=>`${n} selected · ${s}`, dockHint:'Items only go to the Recycle Bin and can be restored. Space is freed once you empty the Recycle Bin.',
+  btnDl:'Download list', btnCopy:'Copy for Claude', pickFirst:'Tick some items first', pickDel:'Tick items to delete first',
+  copied:'Copied! Paste it into your Claude chat', downloaded:'Downloaded approved.txt — put it in the pc-scan folder and run run_cleanup.bat',
+  cIntro:(n,s)=>`I selected ${n} item(s) (about ${s}) in the PC cleanup report. Please handle them:`, cDel:'[Move to Recycle Bin] Items', cList:'Cleanup list (approved.txt):', cMove:d=>`[Move to ${d}]`, cGen:'Generated by PC Cleanup Report',
+  lastOpen:'Last opened', noData:'No scan data found', noDataD:'Please run scan.ps1 again.',
+  recycle:d=>`Recycle Bin (${d})`, recycleN:'Emptying it is permanent — check it and empty it yourself',
+  oldVer:(a,n)=>`${a} old versions (${n})`, oldVerN:v=>`Current version ${v} is kept. Close the program before cleaning. Size is a minimum estimate.`, program:'App',
+  dmp:'Crash dump', upd:'Installer left over after an app update; the installed version no longer needs it', adobe:'Adobe render/media cache — rebuilds, but the project must re-render next time',
+  appFile:'Part of a program or its data — uninstall the program instead of deleting by hand', selfJudge:'Your call',
+  L:{
+  'User temp files (%TEMP%)':['User temp files','Leftover temporary files; files in use are skipped'],
+  'Windows temp files':['Windows temp files','Some files need administrator rights and will be skipped'],
+  'Crash dumps':['Crash dumps','Records left when programs crash; not needed day to day'],
+  'Windows error reports':['Windows error reports','Clean via Settings → Storage → Temporary files'],
+  'DirectX shader cache':['DirectX shader cache','Rebuilds automatically; first game launch is a bit slower'],
+  'NVIDIA DX shader cache':['NVIDIA shader cache (DX)','Rebuilds automatically; first game launch is a bit slower'],
+  'NVIDIA GL shader cache':['NVIDIA shader cache (GL)','Rebuilds automatically'],
+  'Chrome cache':['Chrome cache','Close Chrome first; logins and history are kept'],
+  'Chrome code cache':['Chrome code cache','Close Chrome first'],
+  'Edge cache':['Edge cache','Close Edge first; logins and history are kept'],
+  'Edge code cache':['Edge code cache','Close Edge first'],
+  'Discord cache':['Discord cache','Close Discord first'],
+  'Discord code cache':['Discord code cache','Close Discord first'],
+  'Steam web cache':['Steam web cache','Close Steam first'],
+  'Minecraft logs (.minecraft)':['Minecraft logs','Old game logs'],
+  'Minecraft crash reports':['Minecraft crash reports','Old crash reports'],
+  'Lunar Client':['Lunar Client data',"Only if you no longer play with Lunar Client"],
+  'Windows Update download cache':['Windows Update download cache','Clean via Settings → System → Storage → Temporary files'],
+  'Downloads folder':['Downloads folder','Personal files — large ones are listed individually below'],
+  'CurseForge Minecraft instances':['CurseForge modpacks','Contain world saves — delete whole modpacks inside CurseForge'],
+  }
+ }
+};
+const qs = new URLSearchParams(location.search).get('lang');
+let LANG = (qs && I18N[qs]) ? qs : /^zh/i.test((REPORT && REPORT.uiCulture) || navigator.language || '') ? 'zh' : 'en';
+const t = (k, ...a) => { const v = I18N[LANG][k]; return typeof v === 'function' ? v(...a) : (v ?? k); };
+
+/* ================= helpers ================= */
+const arr = x => Array.isArray(x) ? x : (x == null ? [] : [x]);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fmt = mb => mb >= 1024 ? (mb/1024).toFixed(1) + ' GB' : Math.round(mb) + ' MB';
+const low = s => String(s || '').toLowerCase();
+const under = (p, root) => { p = low(p); root = low(root).replace(/\\+$/, ''); return p === root || p.startsWith(root + '\\'); };
+const base = p => String(p).split('\\').pop();
+const $ = id => document.getElementById(id);
+
+if (!REPORT) { document.body.innerHTML = `<div class="wrap"><h1>${t('noData')}</h1><p>${t('noDataD')}</p></div>`; throw 0; }
+const R = REPORT, drives = arr(R.drives), cleanable = arr(R.cleanable), largeFiles = arr(R.largeFiles);
+const otherDrive = drives.filter(d => d.drive.toUpperCase() !== 'C:').sort((a, b) => b.freeGB - a.freeGB)[0];
+let green, yellow, info, all;
+
+/* ================= classify (re-run per language for labels) ================= */
+function classify() {
+  green = []; yellow = []; info = [];
+  const L = t('L'), label = c => L[c.name] || [c.name, c.note || ''];
+  const covered = [];
+  for (const c of cleanable) {
+    const [nm, note] = label(c);
+    if (/Recycle Bin/i.test(c.name)) { info.push({ name: t('recycle', (c.name.match(/\((.*)\)/)||[])[1]), note: t('recycleN'), size: c.sizeMB }); continue; }
+    if (/Downloads folder|CurseForge Minecraft instances/i.test(c.name)) { info.push({ name: nm, note, size: c.sizeMB, path: c.path }); continue; }
+    covered.push(c.path);
+    if (/\\ProgramData\\Microsoft\\/i.test(c.path) || /SoftwareDistribution/i.test(c.path)) { info.push({ name: nm, note, size: c.sizeMB, path: c.path }); continue; }
+    if (c.sizeMB < 1) continue;
+    (c.risk === 'safe' ? green : yellow).push({ key: 'c:' + c.path, name: nm, note, size: c.sizeMB, path: c.path, approve: [c.risk === 'safe' ? c.path + '\\*' : c.path] });
+  }
+  // old-version folders: same file under ...\<x.y.z>\...
+  const verRx = /^v?\d+(\.\d+){2,}$/, groups = {}, used = new Set();
+  for (const f of largeFiles) {
+    const s = f.path.split('\\'), i = s.findIndex(x => verRx.test(x));
+    if (i < 0) continue;
+    const k = low(s.slice(0, i).join('\\')) + '|' + low(s.slice(i + 1).join('\\'));
+    (groups[k] = groups[k] || []).push({ f, ver: s[i], folder: s.slice(0, i + 1).join('\\'), parent: s.slice(0, i) });
+  }
+  const cmp = (a, b) => { const x = a.replace(/^v/,'').split('.').map(Number), y = b.replace(/^v/,'').split('.').map(Number);
+    for (let k = 0; k < Math.max(x.length, y.length); k++) { const d = (x[k]||0) - (y[k]||0); if (d) return d; } return 0; };
+  for (const g of Object.values(groups)) {
+    if (g.length < 2) continue;
+    g.sort((a, b) => cmp(b.ver, a.ver));
+    const newest = g[0], old = g.slice(1);
+    const app = newest.parent.filter(s => !/^(apps?|versions?|bin|program files.*|appdata|local|roaming|users|[a-z]:)$/i.test(s) && s !== R.user).pop() || t('program');
+    g.forEach(x => used.add(x.f.path));
+    yellow.push({ key: 'v:' + newest.parent.join('\\'), name: t('oldVer', app, old.length), note: t('oldVerN', newest.ver),
+      size: old.reduce((s, x) => s + x.f.sizeMB, 0), path: newest.parent.join('\\'), atLeast: true, approve: old.map(x => x.folder) });
+  }
+  const mediaRx = /\.(mp4|mov|mkv|avi|wmv|flv|webm|m4v|wav|mp3|flac|zip|rar|7z|iso|img|psd|prproj)$/i, personal = [];
+  for (const f of largeFiles) {
+    if (used.has(f.path) || covered.some(r => under(f.path, r))) continue;
+    const p = f.path, inApp = /\\AppData\\/i.test(p), it = { key: 'f:' + p, name: base(p), size: f.sizeMB, path: p, approve: [p] };
+    if (f.ext === '.dmp') { green.push({ ...it, note: t('dmp') }); continue; }
+    if (inApp && f.ext === '.exe' && /\\(download|downloads|update|updates|installer|packages)\\/i.test(p)) { green.push({ ...it, note: t('upd') }); continue; }
+    if (/(Video Previews|Audio Previews|Media Cache)/i.test(p)) { yellow.push({ ...it, note: t('adobe') }); continue; }
+    if (!inApp && mediaRx.test(p)) { personal.push({ ...it, note: t('lastOpen') + ': ' + (f.lastAccess || '?') + ' · ' + p.split('\\').slice(-2, -1)[0], movable: true }); continue; }
+    info.push({ name: base(p), note: inApp ? t('appFile') : t('selfJudge'), size: f.sizeMB, path: p });
+  }
+  yellow.push(...personal);
+  [green, yellow, info].forEach(l => l.sort((a, b) => b.size - a.size));
+  let n = 0; [...green, ...yellow].forEach(it => it.no = ++n);
+  all = [...green, ...yellow];
+}
+
+/* ================= security ================= */
+function securityItems() {
+  const s = R.security || {}, d = s.defender || {}, out = [];
+  if (d.antivirusEnabled === false || d.realTimeProtection === false) out.push({ level: 'bad', t: t('defOff'), d: t('defOffD') });
+  else out.push({ level: 'ok', t: t('defOn'), d: t('defOnD', d.signatureAgeDays) });
+  if (d.signatureAgeDays > 7) out.push({ level: 'warn', t: t('sigOld'), d: t('sigOldD') });
+  if (!d.lastFullScan) out.push({ level: 'warn', t: t('noFull'), d: t('noFullD') });
+  const th = arr(s.recentThreats);
+  out.push(th.length ? { level: 'bad', t: t('threats', th.length), d: t('threatsD') } : { level: 'ok', t: t('noThreats'), d: '' });
+  arr(s.flaggedStartup).forEach(x => {
+    const miss = arr(x.flags).includes('file-missing');
+    out.push({ level: miss ? 'info' : 'warn', t: t('stItem', x.name), d: miss ? t('stMissingD') : t('stFlagD', arr(x.flags).join(', '), x.exe || x.command) });
+  });
+  const fi = s.fractureiserIndicators || {};
+  if (arr(fi.files).length || arr(fi.startupEntries).length) out.push({ level: 'bad', t: t('frac'), d: t('fracD') });
+  else if (s.minecraftModJarCount) out.push({ level: 'ok', t: t('mods', s.minecraftModJarCount), d: t('modsD') });
+  const odd = arr(s.recentExecutablesInTempOrDownloads).filter(e => !/\.tmp\.js$|\\scoped_dir|\\jna-|\\jianyingpro_ext\\/i.test(e.path));
+  if (odd.length) out.push({ level: 'info', t: t('exe', odd.length), d: odd.slice(0, 5).map(e => base(e.path)).join(', ') + (odd.length > 5 ? ' …' : '') + '. ' + t('exeD') });
+  return out;
+}
+
+/* ================= render ================= */
+function render() {
+  const keep = new Map([...document.querySelectorAll('input[type=checkbox][data-key]:checked')].map(c => {
+    const s = document.querySelector(`select.act[data-key="${CSS.escape(c.dataset.key)}"]`); return [c.dataset.key, s ? s.value : 'del']; }));
+  classify();
+  document.documentElement.lang = LANG === 'zh' ? 'zh-Hant' : 'en';
+  document.title = t('title');
+  document.querySelectorAll('.langsw button').forEach(b => b.classList.toggle('on', b.dataset.lang === LANG));
+  $('title').textContent = t('title');
+  $('meta').textContent = `${R.computer || ''} · ${R.os || ''} · ${t('scanned')} ${String(R.generatedAt || '').replace('T', ' ')} (${R.elapsedSeconds || '?'} ${t('sec')})` + (R.isAdmin ? '' : ' · ' + t('nonAdmin'));
+
+  $('drives').innerHTML = drives.map(d => {
+    const col = d.freePct < 10 ? 'var(--red)' : d.freePct < 20 ? 'var(--yellow)' : 'var(--green)';
+    const tag = d.freePct < 10 ? `<span class="pill p-red">${t('low')}</span>` : d.freePct < 20 ? `<span class="pill p-yellow">${t('little')}</span>` : `<span class="pill p-green">${t('ok')}</span>`;
+    return `<div class="stat"><div style="display:flex;justify-content:space-between"><b>${esc(d.drive)} ${esc(d.label || '')}</b>${tag}</div>
+      <div class="bar"><div style="width:${100 - d.freePct}%;background:${col}"></div></div>
+      <div class="lbl">${t('free')} <b>${d.freeGB} GB</b> ${t('of')} ${d.totalGB} GB (${d.freePct}%)</div></div>`;
+  }).join('');
+
+  const sumG = green.reduce((s, x) => s + x.size, 0), sumY = yellow.reduce((s, x) => s + x.size, 0);
+  const issues = securityItems().filter(x => x.level !== 'ok').length;
+  $('summary').innerHTML = `
+    <div class="card stat" style="margin:0"><div class="num" style="color:var(--green)">${fmt(sumG)}</div><div class="lbl">${t('safeSum')}</div></div>
+    <div class="card stat" style="margin:0"><div class="num" style="color:var(--yellow)">${fmt(sumY)}</div><div class="lbl">${t('checkSum')}</div></div>
+    <div class="card stat" style="margin:0"><div class="num" style="color:${issues ? 'var(--yellow)' : 'var(--green)'}">${issues ? t('alerts', issues) : t('noAlerts')}</div><div class="lbl">${t('secSum')}</div></div>`;
+
+  const row = it => {
+    const k = esc(it.key), chk = keep.has(it.key) ? 'checked' : '', act = keep.get(it.key);
+    const mv = it.movable && otherDrive ? `<div><select data-key="${k}" class="act"><option value="del">${t('actDel')}</option><option value="move" ${act === 'move' ? 'selected' : ''}>${esc(t('actMove', otherDrive.drive, otherDrive.freeGB))}</option></select></div>` : '';
+    return `<label class="item"><input type="checkbox" data-key="${k}" ${chk}><span class="no">${it.no}</span>
+      <div><div class="name">${esc(it.name)}</div><div class="note">${esc(it.note)}</div>${it.path ? `<div class="path">${esc(it.path)}</div>` : ''}${mv}</div>
+      <div class="size">${it.atLeast ? '≥ ' : ''}${fmt(it.size)}</div></label>`;
+  };
+  const section = (id, icon, title, pill, list, tools) => {
+    const col = $(id).classList.contains('collapsed');
+    $(id).innerHTML = `<div class="sec-head"><h2>${icon} ${title} <span class="pill ${pill}">${t('items', list.length)}</span></h2><span class="tot">${fmt(list.reduce((s, x) => s + x.size, 0))} ▾</span></div>
+      ${tools ? `<div class="sec-tools">${tools}</div>` : ''}<div class="items">${list.length ? list.map(row).join('') : `<div class="empty">${t('none')}</div>`}</div>`;
+    $(id).classList.toggle('collapsed', col);
+    $(id).querySelector('.sec-head').onclick = () => $(id).classList.toggle('collapsed');
+  };
+  section('sec-green', '🟢', t('green'), 'p-green', green, `<button class="link" id="allGreen">${t('selectAll')}</button>`);
+  section('sec-yellow', '🟡', t('yellow'), 'p-yellow', yellow, '');
+  $('sec-info').innerHTML = `<div class="sec-head"><h2>⚪ ${t('info')} <span class="pill p-gray">${t('items', info.length)}</span></h2><span class="tot">${t('expand')} ▾</span></div>
+    <div class="items">${info.map(it => `<div class="item info"><span class="no">–</span><div><div class="name">${esc(it.name)}</div><div class="note">${esc(it.note)}</div>${it.path ? `<div class="path">${esc(it.path)}</div>` : ''}</div><div class="size">${fmt(it.size || 0)}</div></div>`).join('')}</div>`;
+  $('sec-info').querySelector('.sec-head').onclick = () => $('sec-info').classList.toggle('collapsed');
+  $('allGreen').onclick = e => { e.preventDefault(); document.querySelectorAll('#sec-green input[type=checkbox]').forEach(c => c.checked = true); update(); };
+
+  $('fTitle').textContent = t('fTitle'); $('fSub').textContent = t('fSub');
+  const folders = arr(R.largeFolders).filter(f => f.sizeMB > 50).slice(0, 12), fmax = Math.max(1, ...folders.map(f => f.sizeMB));
+  $('folders').innerHTML = folders.map(f => `<div class="row"><div class="lab" title="${esc(f.path)}">${esc(base(f.path))}</div><div><div class="b" style="width:${(100 * f.sizeMB / fmax).toFixed(1)}%"></div></div><div class="v">${fmt(f.sizeMB)}</div></div>`).join('') || `<div class="empty">${t('fNone')}</div>`;
+
+  // programs
+  const progs = arr(R.programs), defOn = (R.security || {}).defender && R.security.defender.antivirusEnabled;
+  const FAM = [[/^Java/i, 'Java'], [/^Python 3/i, 'Python'], [/Visual Studio Code/i, 'VS Code'], [/^Node\.js/i, 'Node.js']], fc = {};
+  progs.forEach(p => { const f = FAM.find(([rx]) => rx.test(p.name)); p.fam = f ? f[1] : null; if (f) fc[f[1]] = (fc[f[1]] || 0) + 1; });
+  progs.forEach(p => {
+    const fl = [];
+    p.keep = /Visual C\+\+|Redistributable|\.NET|DirectX|NVIDIA|Update Health|Compatibility/i.test(p.name) || /^Microsoft (Edge|365|OneNote|OneDrive)|^Copilot$|^Microsoft GameInput|^Xbox/i.test(p.name);
+    if (p.fam && fc[p.fam] > 1) fl.push(t('dupFam', fc[p.fam], p.fam));
+    if (defOn && /McAfee|Norton|Avast|AVG|Avira|Kaspersky|Trend Micro|ESET/i.test(p.name)) fl.push(t('avDup'));
+    if (!p.keep && (p.sizeMB || 0) >= 2000) fl.push(t('big'));
+    p.flags = fl;
+  });
+  const flagged = progs.filter(p => p.flags.length).sort((a, b) => (b.sizeMB || 0) - (a.sizeMB || 0));
+  const pr = p => `<tr><td><b>${esc(p.name)}</b><div class="sub">${esc(p.publisher || '')}${p.installDate ? ' · ' + t('installed') + ' ' + esc(p.installDate) : ''}</div></td><td class="r">${p.sizeMB ? fmt(p.sizeMB) : '—'}</td><td>${p.flags.length ? p.flags.map(esc).join('<br>') : (p.keep ? `<span class="sub">${t('keepSys')}</span>` : '')}</td></tr>`;
+  $('programs').innerHTML = `<div class="sec-head"><h2>${t('progTitle')} <span class="pill p-gray">${t('progCount', progs.length)}</span></h2></div>
+    <div class="sub" style="margin-top:4px">${t('progHow')}</div>
+    <table><thead><tr><th>${t('thProg')}</th><th class="r">${t('thSize')}</th><th>${t('thAdvice')}</th></tr></thead><tbody id="progBody">${flagged.map(pr).join('') || `<tr><td colspan="3" class="sub">${t('progNone')}</td></tr>`}</tbody></table>
+    <div style="margin-top:8px"><button class="link" id="progAll">${t('progAll', progs.length)}</button></div>`;
+  $('progAll').onclick = () => { $('progBody').innerHTML = progs.slice().sort((a, b) => (b.sizeMB || 0) - (a.sizeMB || 0)).map(pr).join(''); $('progAll').remove(); };
+
+  // startup
+  const miss = !('startup' in R), st = miss ? arr((R.security || {}).flaggedStartup) : arr(R.startup);
+  const KEEP = /SecurityHealth|Windows Defender|RtkAudio|Realtek|NVIDIA|Intel|AMD|igfx|OneDrive|Synaptics|ELAN/i;
+  const sr = x => { const f = arr(x.flags);
+    const tip = f.includes('file-missing') ? `<span class="pill p-gray">${t('stLeft')}</span>` : f.length ? `<span class="pill p-yellow">${t('stLook')}</span>`
+      : KEEP.test(x.name + ' ' + x.command) ? `<span class="pill p-green">${t('stKeep')}</span>` : x.source === 'ScheduledTask' ? `<span class="pill p-gray">${t('stTask')}</span>` : `<span class="pill p-gray">${t('stOpt')}</span>`;
+    return `<tr><td><b>${esc(x.name)}</b><div class="path">${esc(x.command)}</div></td><td>${esc(x.signer || (x.signature === 'Valid' ? t('signed') : t('unknown')))}</td><td>${tip}</td></tr>`; };
+  $('startup').innerHTML = `<h2>${t('stTitle')} <span class="pill p-gray">${t('items', st.length)}</span></h2>
+    ${miss ? `<div class="sub" style="color:var(--yellow)">${t('stOld')}</div>` : ''}<div class="sub">${t('stHow')}</div>
+    <table><thead><tr><th>${t('thItem')}</th><th>${t('thPub')}</th><th>${t('thAdvice')}</th></tr></thead><tbody>${st.map(sr).join('') || `<tr><td colspan="3" class="sub">${t('stNone')}</td></tr>`}</tbody></table>`;
+
+  const ICON = { ok: '✅', warn: '⚠️', bad: '⛔', info: 'ℹ️' };
+  $('security').innerHTML = `<h2>${t('secTitle')}</h2><div class="sub">${t('secSub')}</div>
+    <div class="sec-list" style="margin-top:8px">${securityItems().map(x => `<div class="s"><div class="ico">${ICON[x.level]}</div><div><b>${esc(x.t)}</b><div class="sub">${esc(x.d)}</div></div></div>`).join('')}</div>`;
+
+  $('dockHint').textContent = t('dockHint'); $('btnDl').textContent = t('btnDl'); $('btnCopy').textContent = t('btnCopy');
+  update();
+}
+
+/* ================= selection ================= */
+function selected() {
+  return [...document.querySelectorAll('input[type=checkbox][data-key]:checked')].map(c => {
+    const it = all.find(x => x.key === c.dataset.key), s = document.querySelector(`select.act[data-key="${CSS.escape(it.key)}"]`);
+    return { ...it, action: s ? s.value : 'del' };
+  });
+}
+function update() { const s = selected(); $('selInfo').textContent = s.length ? t('sel', s.length, fmt(s.reduce((a, x) => a + x.size, 0))) : t('selNone'); }
+document.addEventListener('change', e => { if (e.target.matches('input[type=checkbox], select.act')) update(); });
+document.querySelectorAll('.langsw button').forEach(b => b.onclick = () => { LANG = b.dataset.lang; render(); });
+
+function approvedText(s) {
+  const lines = ['# ' + t('cGen') + ' ' + new Date().toLocaleString()];
+  s.filter(x => x.action === 'del').forEach(x => { lines.push('# ' + x.no + ' ' + x.name); x.approve.forEach(a => lines.push(a)); });
+  return lines.join('\r\n') + '\r\n';
+}
+function claudeText(s) {
+  const del = s.filter(x => x.action === 'del'), mv = s.filter(x => x.action === 'move');
+  let txt = t('cIntro', s.length, fmt(s.reduce((a, x) => a + x.size, 0))) + '\n';
+  if (del.length) txt += `\n${t('cDel')} ${del.map(x => x.no).join(', ')}\n` + del.map(x => `${x.no}. ${x.name} (${fmt(x.size)})`).join('\n') + `\n\n${t('cList')}\n` + approvedText(del);
+  if (mv.length) txt += `\n${t('cMove', otherDrive.drive)}\n` + mv.map(x => `${x.no}. ${x.path}`).join('\n') + '\n';
+  return txt;
+}
+function toast(m) { const el = $('toast'); el.textContent = m; el.classList.add('on'); setTimeout(() => el.classList.remove('on'), 2200); }
+$('btnCopy').onclick = async () => {
+  const s = selected(); if (!s.length) return toast(t('pickFirst'));
+  const txt = claudeText(s);
+  try { await navigator.clipboard.writeText(txt); }
+  catch { const ta = document.createElement('textarea'); ta.value = txt; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove(); }
+  toast(t('copied'));
+};
+$('btnDl').onclick = () => {
+  const s = selected().filter(x => x.action === 'del'); if (!s.length) return toast(t('pickDel'));
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob(['﻿' + approvedText(s)], { type: 'text/plain' }));
+  a.download = 'approved.txt'; a.click(); toast(t('downloaded'));
+};
+render();
+</script>
+</body>
+</html>
